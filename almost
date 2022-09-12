@@ -68,6 +68,11 @@ READWRITE_PATHS="
     /var
 "
 
+# Load the configuration file
+if [ -f /etc/almost.conf ]; then
+	. /etc/almost.conf
+fi
+
 perform_enter() {
 
 	# If mode is not specified, just read from the config file
@@ -83,6 +88,7 @@ perform_enter() {
 	if [ "${mode}" = "rw" ]; then
 		# Letting the system be rw, at this point we do for both groups of directories
 		# for a good measure.
+		printf "Unlocking system...\n"
 		all_dirs="$(find ${READONLY_PATHS} ${READWRITE_PATHS} -type f -o -type d)"
 		for dir in $all_dirs; do
 			chattr -R -i -f "${dir}"
