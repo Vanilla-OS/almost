@@ -61,7 +61,6 @@ READONLY_PATHS="
 READWRITE_PATHS="
     /boot
     /etc
-    /home
     /mnt
     /opt
     /snap
@@ -84,21 +83,24 @@ perform_enter() {
 	if [ "${mode}" = "rw" ]; then
 		# Letting the system be rw, at this point we do for both groups of directories
 		# for a good measure.
-		printf "Unlocking system...\n"
-		for dir in $READONLY_PATHS $READWRITE_PATHS; do
-			chattr -R -i "${dir}"
+		all_dirs="$(find ${READONLY_PATHS} ${READWRITE_PATHS} -type f -o -type d)"
+		for dir in $all_dirs; do
+			chattr -R -i -f "${dir}"
 		done
+		
 	else
 		# Locking down the system
 		printf "Locking system...\n"
-		for dir in $READONLY_PATHS; do
-			chattr -R +i "${dir}"
+		ro_dirs="$(find ${READONLY_PATHS} -type f -o -type d)"
+		for dir in $ro_dirs; do
+			chattr -R +i -f "${dir}"
 		done
 
 		# but ensure the read-write paths are kept as they should
 		printf "Ensuring writable directories...\n"
-		for dir in $READWRITE_PATHS; do
-			chattr -R -i "${dir}"
+		rw_dirs="$(find ${READWRITE_PATHS} -type f -o -type d)"
+		for dir in $rw_dirs; do
+			chattr -R -i -f "${dir}"
 		done
 	fi
 }
