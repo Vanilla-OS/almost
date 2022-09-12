@@ -1,0 +1,174 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# This file is part of the Vanilla-OS project:
+#    https://github.com/Vanilla-OS
+#
+# Copyright (C) 2022 Vanilla-OS contributors
+#
+# Vanilla-OS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 3
+# as published by the Free Software Foundation.
+#
+# Vanilla-OS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Vanilla-OS; if not, see <http://www.gnu.org/licenses/>.
+
+verbose=0
+enter=0
+mode=""
+set_persist=0
+version="0.0.1"
+
+if ! command -v chattr > /dev/null; then
+	printf >&2 "Error: missing dependency chattr\n"
+	exit 127
+fi
+
+show_help() {
+	cat << EOF
+almost version: ${version}
+
+Usage:
+
+	almost [enter,set-persist] [rw,ro]
+
+Options:
+
+	--help/-h:		show this message
+	--verbose/-v:		show more verbosity
+	--version/-V:		show version
+	enter:		set the filesystem as ro or rw until reboot
+	set-persist:		set the filesystem as ro or rw permanently
+EOF
+}
+
+# These are part of the immutable core, we should have those set with the
+# immutable chattr bits
+READONLY_PATHS="
+    /bin
+    /lib
+    /lib64
+    /sbin
+    /usr
+"
+
+# These are instead foundamental to keep read-write, for normal operations
+READWRITE_PATHS="
+    /boot
+    /etc
+    /home
+    /mnt
+    /opt
+    /snap
+    /usr/local
+    /var
+"
+
+perform_enter() {
+
+	# If mode is not specified, just read from the config file
+	if [ -z "${mode}" ]; then
+		if [ -e /etc/almost.conf ]; then
+			mode="$(grep ^persist /etc/almost.conf | cut -d'=' -f2)"
+		else
+			printf >&2 "Error: insufficient parameters\n"
+			exit 1
+		fi
+	fi
+
+	if [ "${mode}" = "rw" ]; then
+		# Letting the system be rw, at this point we do for both groups of directories
+		# for a good measure.
+		printf "Unlocking system...\n"
+		for dir in $READONLY_PATHS $READWRITE_PATHS; do
+			chattr -R -i "${dir}"
+		done
+	else
+		# Locking down the system
+		printf "Locking system...\n"
+		for dir in $READONLY_PATHS; do
+			chattr -R +i "${dir}"
+		done
+
+		# but ensure the read-write paths are kept as they should
+		printf "Ensuring writable directories...\n"
+		for dir in $READWRITE_PATHS; do
+			chattr -R -i "${dir}"
+		done
+	fi
+}
+
+set_persist_command() {
+	mode=$1
+
+	echo "persist=$mode" > /etc/almost.conf
+}
+
+if [ $# -eq 0 ]; then
+	show_help
+	exit
+fi
+
+while :; do
+	case $1 in
+		-h | --help)
+			# Call a "show_help" function to display a synopsis, then exit.
+			show_help
+			exit 0
+			;;
+		-v | --verbose)
+			verbose=1
+			shift
+			;;
+		-V | --version)
+			printf "almost: %s\n" "${version}"
+			exit 0
+			;;
+		enter)
+			enter=1
+			if [ -n "$2" ]; then
+				mode=$2
+				shift
+			fi
+			shift
+			;;
+		set-persist)
+			set_persist=1
+			if [ -n "$2" ]; then
+				mode=$2
+				shift
+			else
+				printf >&2 "Error: insufficient parameters\n"
+				exit 1
+			fi
+			shift
+			;;
+		*) # Default case: If no more options then break out of the loop.
+			break
+			;;
+	esac
+done
+
+set -o errexit
+set -o nounset
+# set verbosity
+if [ "${verbose}" -ne 0 ]; then
+	set -o xtrace
+fi
+
+# We only accept rw and ro
+if  [ "${mode}" != "rw" ] && [ "${mode}" != "ro" ]; then
+	printf >&2 "Error: invalid parameters\n"
+	exit 1
+fi
+
+if [ "${enter}" -eq 1 ]; then
+	perform_enter "${mode}"
+elif [ "${set_persist}" -eq 1 ]; then
+	set_persist_command "${mode}"
+fi
