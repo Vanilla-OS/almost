@@ -58,15 +58,18 @@ READONLY_PATHS="
 "
 
 # These are instead foundamental to keep read-write, for normal operations
-READWRITE_PATHS="
-    /boot
-    /etc
-    /mnt
-    /opt
-    /snap
-    /usr/local
-    /var
-"
+# READWRITE_PATHS="
+#     /boot
+#     /etc
+#     /mnt
+#     /opt
+#     /snap
+#     /usr/local
+#     /var
+# "
+# NOTE: since we don't handle symlinks, the paths above are never touched by
+#	   'almost', keeping them disabled to speed up the process
+READWRITE_PATHS=""
 
 # Load the configuration file
 if [ -f /etc/almost.conf ]; then
