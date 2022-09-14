@@ -34,7 +34,11 @@ func NewCheckCommand() *cobra.Command {
 }
 
 func check(cmd *cobra.Command, args []string) error {
-	mode, err := core.Get("Almost:.CurrentMode")
+	if !core.RootCheck(true) {
+		return nil
+	}
+
+	mode, err := core.Get("Almost::CurrentMode")
 	if err != nil {
 		return err
 	}
