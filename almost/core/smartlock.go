@@ -20,8 +20,12 @@ func init() {
 			os.Exit(1)
 		}
 		f.WriteString(`#!/bin/sh
-if almost check | grep -q 'Mode: ro'; then")
-echo "The system is locked, the package manager is disabled. Use apx instead or enter in rw mode."")
+if [ "id -u" -ne 0 ]; then
+	echo "You must be root to use the package manager."
+	exit 1
+fi
+if almost check | grep -q 'Mode: ro'; then
+	echo "The system is locked, the package manager is disabled. Use apx instead or enter in rw mode."
 else
 ` + newEntryPoint + ` $@
 fi
