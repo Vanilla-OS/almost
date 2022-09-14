@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"os/exec"
+	"sync"
 )
 
 var managed_paths = []string{
@@ -19,13 +20,22 @@ func EnterRo(verbose bool) error {
 	}
 
 	fmt.Println("Locking system..")
+	var wg sync.WaitGroup
 
 	for _, path := range managed_paths {
+		wg.Add(1)
+
 		if verbose {
 			fmt.Println("Processing: ", path)
 		}
-		SetImmutableFlag(path, verbose, 0, false)
+
+		go func(path string) {
+			defer wg.Done()
+			SetImmutableFlag(path, verbose, 0, false)
+		}(path)
 	}
+
+	wg.Wait()
 
 	fmt.Println("System is now locked.")
 	Set("Almost::CurrentMode", "0")
@@ -38,12 +48,19 @@ func EnterRw(verbose bool) error {
 	}
 	
 	fmt.Println("Unlocking system..")
+	var wg sync.WaitGroup
 
 	for _, path := range managed_paths {
+		wg.Add(1)
+
 		if verbose {
 			fmt.Println("Processing: ", path)
 		}
-		SetImmutableFlag(path, verbose, 1, false)
+		
+		go func(path string) {
+			defer wg.Done()
+			SetImmutableFlag(path, verbose, 1, false)
+		}(path)
 	}
 
 	fmt.Println("System is now unlocked.")
