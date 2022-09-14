@@ -1,9 +1,0 @@
-#!/bin/sh
-
-printf >&2 "Error: the system is in read-only mode, use 'apx' to install packages
-in the internal container instead.
-
-If you still want to use apt, you can use 'almost enter rw' to set the system
-to read-write mode. Remember to set it back to read-only mode when you're done
-by using 'almost enter ro'."
-exit 1
