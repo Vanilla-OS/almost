@@ -8,10 +8,14 @@ import (
 var smartLockpath = "/etc/almost-smartlock"
 
 func init() {
+	if !RootCheck(false) {
+		return
+	}
+
 	entryPoint, _ := Get("Almost::PkgManager::EntryPoint")
 	newEntryPoint := entryPoint + "-almost"
 
-	SetImmutableFlag(entryPoint, true, 1, false)
+	SetImmutableFlag(entryPoint, false, 1, false)
 
 	if _, err := os.Stat(smartLockpath); os.IsNotExist(err) {
 		f, err := os.Create(smartLockpath)
@@ -24,7 +28,7 @@ if [ "id -u" -ne 0 ]; then
 	echo "You must be root to use the package manager."
 	exit 1
 fi
-if almost check | grep -q 'Mode: ro'; then
+if sudo almost check | grep -q 'Mode: ro'; then
 	echo "The system is locked, the package manager is disabled. Use apx instead or enter in rw mode."
 else
 ` + newEntryPoint + ` $@

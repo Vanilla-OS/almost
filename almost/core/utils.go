@@ -5,9 +5,11 @@ import (
 	"os"
 )
 
-func RootCheck() bool {
+func RootCheck(display bool) bool {
 	if os.Geteuid() != 0 {
-		fmt.Println("You must be root to run this command")
+		if display {
+			fmt.Println("You must be root to run this command")
+		}
 		return false
 	}
 	return true

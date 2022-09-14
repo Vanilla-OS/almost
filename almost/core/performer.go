@@ -14,6 +14,10 @@ var managed_paths = []string{
 }
 
 func EnterRo(verbose bool) error {
+	if !RootCheck(false) {
+		return nil
+	}
+
 	fmt.Println("Locking system..")
 
 	for _, path := range managed_paths {
@@ -29,7 +33,7 @@ func EnterRo(verbose bool) error {
 }
 
 func EnterRw(verbose bool) error {
-	if !RootCheck() {
+	if !RootCheck(false) {
 		return nil
 	}
 	
@@ -48,7 +52,7 @@ func EnterRw(verbose bool) error {
 }
 
 func EnterDefault(verbose bool) error {
-	if !RootCheck() {
+	if !RootCheck(false) {
 		return nil
 	}
 	
@@ -80,12 +84,12 @@ func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {
 	if state == 1 {
 		err := exec.Command("chattr", "-R", "-i", "-f", path).Run()
 		if err != nil && verbose {
-			fmt.Println("Error while setting immutable flag: ", err)
+			fmt.Println("Error while removing immutable flag: ", err)
 		}
 	} else {
 		err := exec.Command("chattr", "-R", "+i", "-f", path).Run()
 		if err != nil && verbose {
-			fmt.Println("Error while removing immutable flag: ", err)
+			fmt.Println("Error while setting immutable flag: ", err)
 		}
 	}
 	return nil
