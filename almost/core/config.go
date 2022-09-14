@@ -19,6 +19,10 @@ var (
 )
 
 func init() {	
+	if !RootCheck(false) {
+		return
+	}
+
 	if _, err := os.Stat(Config); os.IsNotExist(err) {
 		f, err := os.Create(Config)
 		if err != nil {
