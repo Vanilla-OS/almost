@@ -45,6 +45,10 @@ func NewEnterCommand() *cobra.Command {
 }
 
 func enter(cmd *cobra.Command, args []string) error {
+	if !core.RootCheck(true) {
+		return nil
+	}
+	
 	if len(args) == 0 {
 		return fmt.Errorf("missing command")
 	}

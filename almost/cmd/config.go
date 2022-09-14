@@ -39,6 +39,9 @@ func NewCmdConfig() *cobra.Command {
 }
 
 func config(cmd *cobra.Command, args []string) error {
+	if !core.RootCheck(true) {
+		return nil
+	}
 	return core.Show()
 }
 
@@ -52,6 +55,10 @@ func CmdConfigSet() *cobra.Command {
 }
 
 func configSet(cmd *cobra.Command, args []string) error {
+	if !core.RootCheck(true) {
+		return nil
+	}
+
 	if len(args) < 2 {
 		return fmt.Errorf("missing key or value")
 	}
