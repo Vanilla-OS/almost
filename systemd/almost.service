@@ -4,7 +4,7 @@ Description=Restore system immutability status according to the 'almoost' config
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/almost enter default
+ExecStart=/usr/bin/almost enter default --on-persistent
 User=root
 
 [Install]
