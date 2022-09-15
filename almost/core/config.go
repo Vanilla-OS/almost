@@ -13,7 +13,7 @@ var (
 	Defaults = map[string]interface{}{
 		"Almost::CurrentMode": 0,
 		"Almost::DefaultMode": 0,
-		"Almost::PersistModeStatus": false,
+		"Almost::PersistModeStatus": true,
 		"Almost::PkgManager::EntryPoint": "/usr/bin/apt",
 	}
 )
