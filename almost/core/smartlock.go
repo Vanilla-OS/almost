@@ -24,7 +24,7 @@ func init() {
 			os.Exit(1)
 		}
 		f.WriteString(`#!/bin/sh
-if [ "id -u" -ne 0 ]; then
+if [ "id -u" != 0 ]; then
 	echo "You must be root to use the package manager."
 	exit 1
 fi
