@@ -68,13 +68,20 @@ func EnterRw(verbose bool) error {
 	return nil
 }
 
-func EnterDefault(verbose bool) error {
+func EnterDefault(verbose bool, on_persistent bool) error {
 	if !RootCheck(false) {
 		return nil
 	}
 	
-	config, _ := Get("Almost::DefaultMode")
-	if config == "0" {
+	confDefault, _ := Get("Almost::DefaultMode")
+	confPersist, _ := Get("Almost::PersistModeStatus")
+
+	if on_persistent && confPersist == "false" {
+		fmt.Println("Persistent mode is disabled, nothing to do.")
+		return nil
+	}
+	
+	if confDefault == "0" {
 		EnterRo(verbose)
 	} else {
 		EnterRw(verbose)

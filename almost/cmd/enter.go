@@ -41,6 +41,7 @@ func NewEnterCommand() *cobra.Command {
 	}
 	cmd.SetUsageFunc(enterUsage)
 	cmd.Flags().BoolP("verbose", "v", false, "verbose output")
+	cmd.Flags().BoolP("on-persistent", "p", false, "used by systemd to enter in default mode only if the persistent mode is enabled")
 	return cmd
 }
 
@@ -54,6 +55,7 @@ func enter(cmd *cobra.Command, args []string) error {
 	}
 
 	verbose, _ := cmd.Flags().GetBool("verbose")
+	on_persistent, _ := cmd.Flags().GetBool("on-persistent")
 
 	switch args[0] {
 	case "ro":
@@ -61,7 +63,7 @@ func enter(cmd *cobra.Command, args []string) error {
 	case "rw":
 		return core.EnterRw(verbose)
 	case "default":
-		return core.EnterDefault(verbose)
+		return core.EnterDefault(verbose, on_persistent)
 	default:
 		return fmt.Errorf("unknown command: %s", args[0])
 	}
