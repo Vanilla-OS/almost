@@ -17,6 +17,11 @@ if ! [ -x "$(command -v apx)" ]; then
   exit 1
 fi
 
+if ! [ -x "$(command -v systemctl)" ]; then
+  echo 'Error: systemctl is not installed.' >&2
+  exit 1
+fi
+
 if ! [ -x "$(command -v distrobox)" ]; then
   echo 'Error: distrobox is not installed (required by apx).' >&2
   exit 1
@@ -32,7 +37,17 @@ fi
 
 # Install binary
 chmod +x almost
-ln -s $(pwd)/almost /usr/local/bin/almost
+if [ -f /usr/bin/almost ]; then
+  rm /usr/bin/almost
+fi
+ln -s $(pwd)/almost /usr/bin/almost
+
+# Systemd unit
+cd ..
+sudo cp systemd/almost.service /usr/lib/systemd/system/almost.service
+sudo systemctl daemon-reload
+sudo systemctl enable almost.service
+sudo systemctl start almost.service
 
 # Done
 printf "Almost installed successfully!"
