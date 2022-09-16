@@ -12,7 +12,7 @@ func configUsage(*cobra.Command) error {
 Manage and show the current configuration.
 
 Usage:
-almost config
+config
 
 Options:
 	--help/-h		show this message
@@ -27,7 +27,7 @@ Examples:
 	return nil
 }
 
-func NewCmdConfig() *cobra.Command {
+func NewConfigCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Show the current configuration",
