@@ -49,9 +49,6 @@ func initDb(db *sql.DB) {
 }
 
 func OverlayAdd(path string, force bool, verbose bool) error {
-	if verbose {
-		fmt.Println("Preparing a new overlay for:", path)
-	}
 	// first we need to check if the given path exists, to avoid overlaying
 	// non-existing directories which is not the desired behaviour
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -94,14 +91,12 @@ func OverlayAdd(path string, force bool, verbose bool) error {
 	// can remove it later
 	registerOverlay(path, workDir, verbose)
 
+	fmt.Printf("Your new overlay is ready at %s", path)
+
 	return nil
 }
 
 func OverlayRemove(path string, keep bool, verbose bool) error {
-	if verbose {
-		fmt.Println("Removing overlay for:", path)
-	}
-
 	// first we need to check if the given has an overlay
 	if !overlayCheck(path, verbose) {
 		return fmt.Errorf("path %s is not overlayed", path)
@@ -119,6 +114,7 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 	// or trash it, in the first case we copy the contents of the temporary
 	// directory to the original one
 	if keep {
+		fmt.Println("Commiting changes to the original directory..")
 		if err := copyDir(workDir, original, verbose); err != nil {
 			fmt.Println("Error copying directory:", err)
 			return err
@@ -128,6 +124,8 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 	// now we need to remove the overlay information from the database and
 	// free the path for future overlays
 	removeOverlay(path, verbose)
+
+	fmt.Printf("Overlay %s removed successfully", path)
 
 	return nil
 }
