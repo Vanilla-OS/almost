@@ -23,6 +23,10 @@ func init() {
 		return
 	}
 
+	if _, err := os.Stat("/etc/almost"); os.IsNotExist(err) {
+		os.Mkdir("/etc/almost", 0755)
+	}
+	
 	if _, err := os.Stat(Config); os.IsNotExist(err) {
 		f, err := os.Create(Config)
 		if err != nil {
