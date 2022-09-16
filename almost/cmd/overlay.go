@@ -69,20 +69,16 @@ func overlay(cmd *cobra.Command, args []string) error {
 }
 
 func listOverlays() error {
-	overlays, err := core.OverlayList()
+	overlays := core.OverlayList()
 	count := len(overlays)
-
-	if err != nil {
-		return fmt.Errorf("failed to list overlays: %v", err)
-	}
 
 	if count == 0 {
 		fmt.Println("No overlays found")
 		return nil
 	}
 	
-	for _, overlay := range overlays {
-		fmt.Println(overlay)
+	for path, workdir := range overlays {
+		fmt.Printf("%s -> %s", path, workdir)
 	}
 	return nil
 }

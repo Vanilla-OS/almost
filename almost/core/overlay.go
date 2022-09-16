@@ -35,11 +35,13 @@ func init() {
 		initDb(db)
 		defer db.Close()
 	}
+	
+	removeOrphanOverlays()
 }
 
 func initDb(db *sql.DB) {
 	sqlStmt := `
-	CREATE TABLE overlays (original TEXT NOT NULL PRIMARY KEY, workdir TEXT, timestamp TEXT);
+	CREATE TABLE overlays (original TEXT NOT NULL PRIMARY KEY, workdir TEXT, timestamp TEXT, persist INTEGER DEFAULT 0);
 	`
 	_, err := db.Exec(sqlStmt)
 	if err != nil {
@@ -130,38 +132,36 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 	return nil
 }
 
-func OverlayList() ([]string, error) {
+func OverlayList() map[string]string {
+	overlays := make(map[string]string)
+
 	db, err := sql.Open("sqlite3", overlaysDbPath)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return overlays
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT original FROM overlays")
+	rows, err := db.Query("SELECT original, workdir FROM overlays")
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return overlays
 	}
 	defer rows.Close()
-
-	var overlays []string
 	for rows.Next() {
-		var original string
-		err = rows.Scan(&original)
-		if err != nil {
+		var original, workdir string
+		if err := rows.Scan(&original, &workdir); err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			return overlays
 		}
-		overlays = append(overlays, original)
+		overlays[original] = workdir
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return overlays
 	}
 
-	return overlays, nil
+	return overlays
 }
 
 func overlayCheck(path string, verbose bool) bool {
@@ -335,4 +335,16 @@ func copyFile(src, dst string, verbose bool) error {
 	}
 
 	return os.Chmod(dst, srcInfo.Mode())
+}
+
+func removeOrphanOverlays() error {
+	overlays := OverlayList()
+	for original, workdir := range overlays {
+		if _, err := os.Stat(workdir); os.IsNotExist(err) {
+			fmt.Println("Removing orphan overlay for:", original)
+			removeOverlay(original, false)
+		}
+	}
+	
+	return nil
 }
