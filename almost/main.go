@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	Version = "0.0.1"
+	Version = "0.0.2"
 )
 
 func help(cmd *cobra.Command, args []string) {
@@ -24,6 +24,7 @@ Commands:
 	enter			set the filesystem as ro or rw until reboot
 	config			show the current configuration
 	check			check whether the filesystem is read-only or read-write
+	overlay			overlay a directory
 `)
 }
 
@@ -38,8 +39,9 @@ func newAlmostCommand() *cobra.Command {
 func main() {
 	rootCmd := newAlmostCommand()
 	rootCmd.AddCommand(cmd.NewEnterCommand())
-	rootCmd.AddCommand(cmd.NewCmdConfig())
+	rootCmd.AddCommand(cmd.NewConfigCommand())
 	rootCmd.AddCommand(cmd.NewCheckCommand())
+	rootCmd.AddCommand(cmd.NewOverlayCommand())
 	rootCmd.SetHelpFunc(help)
 	rootCmd.Execute()
 }
