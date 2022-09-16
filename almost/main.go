@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/vanilla-os/almost/cmd"
@@ -33,6 +34,12 @@ func newAlmostCommand() *cobra.Command {
 		Use:   "almost",
 		Short: "Almost provides a simple way to set the filesystem as read-only or read-write",
 		Version: Version,
+	}
+}
+
+func init() {
+	if _, err := os.Stat("/etc/almost"); os.IsNotExist(err) {
+		os.Mkdir("/etc/almost", 0755)
 	}
 }
 
