@@ -1,0 +1,28 @@
+Source: almost
+Section: devel
+Priority: extra
+Maintainer: Mirko Brombin <send@mirko.pm>
+Uploaders: Mirko Brombin <send@mirko.pm>
+Build-Depends: debhelper (>= 9),
+               dh-golang,
+               golang-go,
+               golang-github-spf13-cobra-dev,
+               golang-github-spf13-viper-dev,
+               golang-github-google-uuid-dev,
+               golang-github-mattn-go-sqlite3-dev
+Standards-Version: 3.9.6
+Homepage: https://github.com/vanilla-os/almost
+Vcs-Browser: https://github.com/vanilla-os/almost
+Vcs-Git: git://github.com/vanilla-os/almost.git
+
+Package: almost
+Architecture: all
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         golang-go,
+         golang-github-spf13-cobra-dev,
+         golang-github-spf13-viper-dev,
+         golang-github-google-uuid-dev,
+         golang-github-mattn-go-sqlite3-dev
+Built-Using: ${misc:Built-Using}
+Description: On-demand immutability for Vanilla OS.

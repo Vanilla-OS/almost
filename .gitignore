@@ -1,2 +1,11 @@
 /almost/almost
 /overlay_test
+/almost*.deb
+/almost*.buildinfo
+/almost*.changes
+/almost*.dsc
+/almost*.tar.xz
+/obj-x86_64-linux-gnu
+/debian/.debhelper
+/debian/*.substvars
+/debian/debhelper-build-stamp

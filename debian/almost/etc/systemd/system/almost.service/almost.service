@@ -1,0 +1,11 @@
+[Unit]
+Description=Restore system immutability status according to the 'almoost' configuration
+
+[Service]
+Type=simple
+RemainAfterExit=yes
+ExecStart=/usr/bin/almost enter default --on-persistent
+User=root
+
+[Install]
+WantedBy=multi-user.target

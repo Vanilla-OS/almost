@@ -28,7 +28,6 @@ if ! [ -x "$(command -v distrobox)" ]; then
 fi
 
 # Compile almost exit if failed
-cd almost
 go build -o almost main.go 
 if [ $? -ne 0 ]; then
   echo 'Error: almost build failed.' >&2
@@ -43,8 +42,7 @@ fi
 ln -s $(pwd)/almost /usr/bin/almost
 
 # Systemd unit
-cd ..
-sudo cp systemd/almost.service /usr/lib/systemd/system/almost.service
+ssudo cp systemd/almost.service /usr/lib/systemd/system/almost.service
 sudo systemctl daemon-reload
 sudo systemctl enable almost.service
 sudo systemctl start almost.service
