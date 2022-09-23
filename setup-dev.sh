@@ -42,7 +42,7 @@ fi
 ln -s $(pwd)/almost /usr/bin/almost
 
 # Systemd unit
-ssudo cp systemd/almost.service /usr/lib/systemd/system/almost.service
+sudo cp systemd/almost.service /usr/lib/systemd/system/almost.service
 sudo systemctl daemon-reload
 sudo systemctl enable almost.service
 sudo systemctl start almost.service
