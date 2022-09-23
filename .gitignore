@@ -9,4 +9,5 @@
 /debian/.debhelper
 /debian/*.substvars
 /debian/debhelper-build-stamp
+/debian/almost
 /almost
