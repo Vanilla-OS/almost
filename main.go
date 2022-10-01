@@ -24,14 +24,15 @@ Commands:
 	enter			set the filesystem as ro or rw until reboot
 	config			show the current configuration
 	check			check whether the filesystem is read-only or read-write
+	run			runs a command in read-write mode and returns to read-only mode after the command exits
 	overlay			overlay a directory
 `)
 }
 
 func newAlmostCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "almost",
-		Short: "Almost provides a simple way to set the filesystem as read-only or read-write",
+		Use:     "almost",
+		Short:   "Almost provides a simple way to set the filesystem as read-only or read-write",
 		Version: Version,
 	}
 }
@@ -42,6 +43,7 @@ func main() {
 	rootCmd.AddCommand(cmd.NewConfigCommand())
 	rootCmd.AddCommand(cmd.NewCheckCommand())
 	rootCmd.AddCommand(cmd.NewOverlayCommand())
+	rootCmd.AddCommand(cmd.NewRunCommand())
 	rootCmd.SetHelpFunc(help)
 	rootCmd.Execute()
 }
