@@ -3,30 +3,30 @@ package core
 import (
 	"fmt"
 	"os"
-	
+
 	"github.com/spf13/viper"
 )
 
 var (
-	Config  = "/etc/almost.ini"
-	Section = "Almost"
+	Config   = "/etc/almost.ini"
+	Section  = "Almost"
 	Defaults = map[string]interface{}{
-		"Almost::CurrentMode": "0",
-		"Almost::DefaultMode": "0",
-		"Almost::PersistModeStatus": true,
+		"Almost::CurrentMode":            "0", // 0 = ro, 1 = rw
+		"Almost::DefaultMode":            "0", // 0 = ro, 1 = rw
+		"Almost::PersistModeStatus":      "0", // 0 = on, 1 = off
 		"Almost::PkgManager::EntryPoint": "/usr/bin/apt",
 	}
 )
 
-func init() {	
+func init() {
 	if !RootCheck(false) {
 		return
 	}
-	
+
 	if _, err := os.Stat("/etc/almost"); os.IsNotExist(err) {
 		os.Mkdir("/etc/almost", 0755)
 	}
-	
+
 	if _, err := os.Stat(Config); os.IsNotExist(err) {
 		f, err := os.Create(Config)
 		if err != nil {
