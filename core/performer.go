@@ -46,7 +46,7 @@ func EnterRw(verbose bool) error {
 	if !RootCheck(false) {
 		return nil
 	}
-	
+
 	fmt.Println("Unlocking system..")
 	var wg sync.WaitGroup
 
@@ -56,7 +56,7 @@ func EnterRw(verbose bool) error {
 		if verbose {
 			fmt.Println("Processing: ", path)
 		}
-		
+
 		go func(path string) {
 			defer wg.Done()
 			SetImmutableFlag(path, verbose, 1, false)
@@ -72,15 +72,15 @@ func EnterDefault(verbose bool, on_persistent bool) error {
 	if !RootCheck(false) {
 		return nil
 	}
-	
+
 	confDefault, _ := Get("Almost::DefaultMode")
 	confPersist, _ := Get("Almost::PersistModeStatus")
 
-	if on_persistent && confPersist == "false" {
+	if on_persistent && confPersist == "1" {
 		fmt.Println("Persistent mode is disabled, nothing to do.")
 		return nil
 	}
-	
+
 	if confDefault == "0" {
 		EnterRo(verbose)
 	} else {
@@ -89,7 +89,7 @@ func EnterDefault(verbose bool, on_persistent bool) error {
 	return nil
 }
 
-func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {	
+func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {
 	if verbose {
 		fmt.Println("Processing: ", path)
 	}
@@ -119,7 +119,7 @@ func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {
 	return nil
 }
 
-func GetImmutableFlag(path string) (int) {
+func GetImmutableFlag(path string) int {
 	out, err := exec.Command("lsattr", path).Output()
 	if err != nil {
 		return 0
