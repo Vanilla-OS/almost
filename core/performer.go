@@ -30,8 +30,8 @@ func EnterRo(verbose bool) error {
 		}
 
 		go func(path string) {
-			defer wg.Done()
 			SetImmutableFlag(path, verbose, 0, false)
+			defer wg.Done()
 		}(path)
 	}
 
@@ -58,8 +58,8 @@ func EnterRw(verbose bool) error {
 		}
 
 		go func(path string) {
-			defer wg.Done()
 			SetImmutableFlag(path, verbose, 1, false)
+			defer wg.Done()
 		}(path)
 	}
 
