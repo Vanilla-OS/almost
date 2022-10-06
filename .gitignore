@@ -6,7 +6,7 @@
 /almost*.dsc
 /almost*.tar.xz
 /obj-x86_64-linux-gnu
-/debian/.debhelper
+/debian/*.debhelper
 /debian/*.substvars
 /debian/debhelper-build-stamp
 /debian/almost
