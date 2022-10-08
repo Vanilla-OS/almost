@@ -33,6 +33,7 @@ func NewRunCommand() *cobra.Command {
 	}
 	cmd.SetUsageFunc(runUsage)
 	cmd.Flags().BoolP("verbose", "v", false, "verbose output")
+	cmd.Flags().SetInterspersed(false)
 	return cmd
 }
 
