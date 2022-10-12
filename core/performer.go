@@ -76,9 +76,21 @@ func EnterDefault(verbose bool, on_persistent bool) error {
 	confDefault, _ := Get("Almost::DefaultMode")
 	confPersist, _ := Get("Almost::PersistModeStatus")
 
-	if on_persistent && confPersist == "1" {
-		fmt.Println("Persistent mode is disabled, nothing to do.")
-		return nil
+	if on_persistent {
+		// this is being called by the systemd unit on shutdown
+		// here we check for offline updates, then set the rw mode
+		// to allow PackageKit install them on next boot
+		_, err := exec.Command("pkcon", "offline-get-prepared").Output()
+		if err == nil {
+			fmt.Println("Offline updates found! Entering rw mode..")
+			return EnterRw(verbose)
+		}
+		// with no updates found, we skip switching mode if the user
+		// disabled the persistent mode
+		if confPersist == "1" {
+			fmt.Println("Persistent mode is disabled, nothing to do.")
+			return nil
+		}
 	}
 
 	if confDefault == "0" {

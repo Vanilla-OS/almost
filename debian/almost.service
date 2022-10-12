@@ -1,9 +1,10 @@
 [Unit]
 Description=Restore system immutability status according to the 'almoost' configuration
 
+Before=shutdown.target packagekit-offline-update.service
+
 [Service]
-Type=simple
-RemainAfterExit=yes
+Type=oneshot
 ExecStart=/usr/bin/almost enter default --on-persistent
 User=root
 
