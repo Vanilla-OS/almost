@@ -2,8 +2,9 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
-	"sync"
+	"path/filepath"
 )
 
 var managed_paths = []string{
@@ -20,22 +21,13 @@ func EnterRo(verbose bool) error {
 	}
 
 	fmt.Println("Locking system..")
-	var wg sync.WaitGroup
 
 	for _, path := range managed_paths {
-		wg.Add(1)
-
 		if verbose {
 			fmt.Println("Processing: ", path)
 		}
-
-		go func(path string) {
-			SetImmutableFlag(path, verbose, 0, false)
-			defer wg.Done()
-		}(path)
+		SetImmutableFlag(path, verbose, 0, false)
 	}
-
-	wg.Wait()
 
 	fmt.Println("System is now locked.")
 	Set("Almost::CurrentMode", "0")
@@ -48,19 +40,13 @@ func EnterRw(verbose bool) error {
 	}
 
 	fmt.Println("Unlocking system..")
-	var wg sync.WaitGroup
 
 	for _, path := range managed_paths {
-		wg.Add(1)
-
 		if verbose {
 			fmt.Println("Processing: ", path)
 		}
 
-		go func(path string) {
-			SetImmutableFlag(path, verbose, 1, false)
-			defer wg.Done()
-		}(path)
+		SetImmutableFlag(path, verbose, 1, false)
 	}
 
 	fmt.Println("System is now unlocked.")
@@ -117,17 +103,38 @@ func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {
 		}
 	}
 
-	if state == 1 {
-		err := exec.Command("chattr", "-R", "-i", "-f", path).Run()
-		if err != nil && verbose {
-			fmt.Println("Error while removing immutable flag: ", err)
+	files, _ := filepath.Glob(filepath.Join(path, "*"))
+
+	for _, file := range files {
+		fi, err := os.OpenFile(file, os.O_WRONLY, 0755)
+
+		if err != nil {
+			if verbose {
+				fmt.Printf("Error opening %s: %v, try opening as a directory", file, err)
+			}
+
+			fi, err = os.Open(file)
+			if err != nil {
+				if verbose {
+					fmt.Printf("Skipping %s: %s", file, err.Error())
+					continue
+				}
+			}
 		}
-	} else {
-		err := exec.Command("chattr", "-R", "+i", "-f", path).Run()
-		if err != nil && verbose {
-			fmt.Println("Error while setting immutable flag: ", err)
+
+		if state == 0 {
+			err := SetAttr(fi, FS_IMMUTABLE_FL)
+			if err != nil && verbose {
+				fmt.Println("Error while removing immutable flag: ", err)
+			}
+		} else {
+			err := UnsetAttr(fi, FS_IMMUTABLE_FL)
+			if err != nil && verbose {
+				fmt.Println("Error while setting immutable flag: ", err)
+			}
 		}
 	}
+
 	return nil
 }
 
