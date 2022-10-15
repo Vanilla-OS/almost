@@ -66,8 +66,7 @@ func EnterDefault(verbose bool, on_persistent bool) error {
 		// this is being called by the systemd unit on shutdown
 		// here we check for offline updates, then set the rw mode
 		// to allow PackageKit install them on next boot
-		_, err := exec.Command("pkcon", "offline-get-prepared").Output()
-		if err == nil {
+		if PackageKitUpdatePrepared() || PackageKitUpgradePrepared() {
 			fmt.Println("Offline updates found! Entering rw mode..")
 			return EnterRw(verbose)
 		}
