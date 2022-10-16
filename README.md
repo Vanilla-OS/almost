@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="almost-logo.png" height="120">
+  <h1 align="center">almost</h1>
+  <p align="center">An on-demand immutability based on file attributes.</p>
+</div>
+
 # almost
 An on-demand immutability for VanillaOS.
 
