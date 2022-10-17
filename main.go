@@ -25,6 +25,7 @@ Commands:
 	config			show the current configuration
 	check			check whether the filesystem is read-only or read-write
 	run			runs a command in read-write mode and returns to read-only mode after the command exits
+	shell			runs a shell in read-write mode and returns to read-only mode after the shell exits
 	overlay			overlay a directory
 `)
 }
@@ -44,6 +45,7 @@ func main() {
 	rootCmd.AddCommand(cmd.NewCheckCommand())
 	rootCmd.AddCommand(cmd.NewOverlayCommand())
 	rootCmd.AddCommand(cmd.NewRunCommand())
+	rootCmd.AddCommand(cmd.NewShellCommand())
 	rootCmd.SetHelpFunc(help)
 	rootCmd.Execute()
 }
