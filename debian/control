@@ -25,6 +25,7 @@ Depends: ${shlibs:Depends},
          golang-github-spf13-viper-dev,
          golang-github-google-uuid-dev,
          golang-github-mattn-go-sqlite3-dev,
+         golang-github-otiai10-copy-dev,
          almost-extras
 Built-Using: ${misc:Built-Using}
 Description: On-demand immutability for Vanilla OS.
