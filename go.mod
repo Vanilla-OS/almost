@@ -30,6 +30,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/otiai10/copy v1.7.0
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.13.0
 )

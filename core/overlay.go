@@ -3,18 +3,17 @@ package core
 import (
 	"database/sql"
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/otiai10/copy"
 	"golang.org/x/sys/unix"
 )
 
 var (
-	overlaysPath = "/etc/almost/overlays"
+	overlaysPath   = "/etc/almost/overlays"
 	overlaysDbPath = "/etc/almost/overlays.db"
 )
 
@@ -35,7 +34,7 @@ func init() {
 		initDb(db)
 		defer db.Close()
 	}
-	
+
 	removeOrphanOverlays()
 }
 
@@ -75,7 +74,7 @@ func OverlayAdd(path string, force bool, verbose bool) error {
 		fmt.Println("Error mounting a tmpfs to the temporary directory:", err)
 		return err
 	}
-	
+
 	if err := copyDir(path, workDir, verbose); err != nil {
 		fmt.Println("Error copying directory:", err)
 		return err
@@ -88,12 +87,12 @@ func OverlayAdd(path string, force bool, verbose bool) error {
 		fmt.Println("Error binding mount:", err)
 		return err
 	}
-	
+
 	// now we need to add the overlay information to the database so that we
 	// can remove it later
 	registerOverlay(path, workDir, verbose)
 
-	fmt.Printf("Your new overlay is ready at %s", path)
+	fmt.Printf("Your new overlay is ready at %s\n", path)
 
 	return nil
 }
@@ -127,7 +126,7 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 	// free the path for future overlays
 	removeOverlay(path, verbose)
 
-	fmt.Printf("Overlay %s removed successfully", path)
+	fmt.Printf("Overlay %s removed successfully\n", path)
 
 	return nil
 }
@@ -181,7 +180,7 @@ func overlayCheck(path string, verbose bool) bool {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	
+
 	var original string
 	var workdir string
 	var timestamp string
@@ -229,7 +228,7 @@ func registerOverlay(path, workDir string, verbose bool) {
 		os.Exit(1)
 	}
 	defer db.Close()
-	
+
 	stmt, err := db.Prepare("INSERT INTO overlays(original, workdir, timestamp) VALUES(?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)
@@ -255,7 +254,7 @@ func removeOverlay(path string, verbose bool) {
 		os.Exit(1)
 	}
 	defer db.Close()
-	
+
 	stmt, err := db.Prepare("DELETE FROM overlays WHERE original = ?")
 	if err != nil {
 		fmt.Println(err)
@@ -281,60 +280,16 @@ func copyDir(src, dst string, verbose bool) error {
 		return err
 	}
 
-	if err := os.MkdirAll(dst, srcInfo.Mode()); err != nil {
-		return err
+	if !srcInfo.IsDir() {
+		return fmt.Errorf("Source is not a directory")
 	}
 
-	entries, err := os.ReadDir(src)
+	err = copy.Copy(src, dst)
 	if err != nil {
 		return err
-	}
-
-	for _, entry := range entries {
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-
-		if entry.IsDir() {
-			if err := copyDir(srcPath, dstPath, verbose); err != nil {
-				return err
-			}
-		} else {
-			if err := copyFile(srcPath, dstPath, verbose); err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil
-}
-
-func copyFile(src, dst string, verbose bool) error {
-	if verbose {
-		fmt.Println("Copying file", src, "to", dst)
-	}
-
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	if _, err := io.Copy(dstFile, srcFile); err != nil {
-		return err
-	}
-
-	srcInfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	return os.Chmod(dst, srcInfo.Mode())
 }
 
 func removeOrphanOverlays() error {
@@ -345,6 +300,6 @@ func removeOrphanOverlays() error {
 			removeOverlay(original, false)
 		}
 	}
-	
+
 	return nil
 }

@@ -36,7 +36,7 @@ func NewOverlayCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "overlay",
 		Short: "Overlay a directory",
-		RunE: overlay,
+		RunE:  overlay,
 	}
 	cmd.SetUsageFunc(overlayUsage)
 	cmd.Flags().BoolP("verbose", "v", false, "enable verbose output")
@@ -47,7 +47,7 @@ func overlay(cmd *cobra.Command, args []string) error {
 	if !core.RootCheck(true) {
 		return nil
 	}
-	
+
 	if len(args) == 0 {
 		return fmt.Errorf("missing command")
 	}
@@ -76,9 +76,11 @@ func listOverlays() error {
 		fmt.Println("No overlays found")
 		return nil
 	}
-	
+
+	fmt.Printf("Found %d overlay(s):\n", count)
+
 	for path, workdir := range overlays {
-		fmt.Printf("%s -> %s", path, workdir)
+		fmt.Printf("%s -> %s\n", path, workdir)
 	}
 	return nil
 }
