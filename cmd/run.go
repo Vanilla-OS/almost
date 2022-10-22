@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -52,9 +53,10 @@ func run(cmd *cobra.Command, args []string) error {
 	core.EnterRw(verbose)
 
 	c := exec.Command(args[0], args[1:]...)
-	c.Stdout = cmd.OutOrStdout()
-	c.Stderr = cmd.OutOrStderr()
-	c.Stdin = cmd.InOrStdin()
+	c.Env = os.Environ()
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
 	err := c.Run()
 
 	if err != nil {
