@@ -63,28 +63,25 @@ func OverlayAdd(path string, force bool, verbose bool) error {
 		return fmt.Errorf("path %s is already overlayed, remove it first", path)
 	}
 
-	// now we need to create a temporary directory where we will store a copy
-	// of the original directory contents
+	// now we need to create a temporary directory where we will store the
+	// overlay structure
 	workDir := fmt.Sprintf("%s/%s", overlaysPath, uuid.New().String())
 	if err := os.Mkdir(workDir, 0755); err != nil {
 		fmt.Println("Error creating temporary directory:", err)
 		return err
 	}
-	if err := unix.Mount("tmpfs", workDir, "tmpfs", 0, ""); err != nil {
-		fmt.Println("Error mounting a tmpfs to the temporary directory:", err)
-		return err
+
+	for _, dir := range []string{"upper", "lower", "work"} {
+		if err := os.MkdirAll(fmt.Sprintf("%s/%s", workDir, dir), 0755); err != nil {
+			fmt.Println("Error creating", dir, "directory:", err)
+			return err
+		}
 	}
 
-	if err := copyDir(path, workDir, verbose); err != nil {
-		fmt.Println("Error copying directory:", err)
-		return err
-	}
-
-	// here is where the magic happens, we bind mount the temporary directory
-	// to the original directory so that any changes made to the original
-	// directory will be stored in the temporary directory
-	if err := unix.Mount(workDir, path, "", unix.MS_BIND, ""); err != nil {
-		fmt.Println("Error binding mount:", err)
+	// here is where the overlay magic happens, we are going to mount the
+	// temporary directory to the original one
+	if err := unix.Mount("overlay", path, "overlay", 0, fmt.Sprintf("lowerdir=%s,upperdir=%s/upper,workdir=%s/work", path, workDir, workDir)); err != nil {
+		fmt.Println("Error mounting overlay:", err)
 		return err
 	}
 
@@ -105,28 +102,31 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 
 	original, workDir := getOverlay(path, verbose)
 
-	// we are going to unmount the temporary directory from the original one
-	if err := unix.Unmount(original, 0); err != nil {
-		fmt.Println("Error unmounting the overlay:", err)
+	// then unmount the overlay
+	if err := unix.Unmount(path, 0); err != nil {
+		fmt.Println("Error unmounting overlay:", err)
 		return err
 	}
 
-	// here we check if the user wants to keep the temporary directory
-	// or trash it, in the first case we copy the contents of the temporary
-	// directory to the original one
+	// remove it from the internal database
+	removeOverlay(path, verbose)
+
+	// if the keep flag is set, we need to merge the upper and lower
+	// directories and copy them to the original path
 	if keep {
-		fmt.Println("Commiting changes to the original directory..")
-		if err := copyDir(workDir, original, verbose); err != nil {
-			fmt.Println("Error copying directory:", err)
+		if err := copy.Copy(fmt.Sprintf("%s/upper", workDir), original); err != nil {
+			fmt.Println("Error copying overlay to original path:", err)
 			return err
 		}
 	}
 
-	// now we need to remove the overlay information from the database and
-	// free the path for future overlays
-	removeOverlay(path, verbose)
+	// finally we need to remove the temporary directory
+	if err := os.RemoveAll(workDir); err != nil {
+		fmt.Println("Error removing temporary directory:", err)
+		return err
+	}
 
-	fmt.Printf("Overlay %s removed successfully\n", path)
+	fmt.Printf("Overlay at %s removed\n", path)
 
 	return nil
 }
@@ -184,7 +184,8 @@ func overlayCheck(path string, verbose bool) bool {
 	var original string
 	var workdir string
 	var timestamp string
-	err = stmt.QueryRow(path).Scan(&original, &workdir, &timestamp)
+	var persist int
+	err = stmt.QueryRow(path).Scan(&original, &workdir, &timestamp, &persist)
 	return err == nil
 }
 
