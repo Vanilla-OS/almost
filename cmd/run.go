@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/vanilla-os/almost/core"
@@ -51,6 +52,11 @@ func run(cmd *cobra.Command, args []string) error {
 
 	fmt.Println("Running command in read-write mode...")
 	core.EnterRw(verbose)
+
+	// NOTE: there is a bug when using "almost run", for some reason the
+	// immutability is not fully disabled when the command exits, so we
+	// have to sleep some seconds to make sure
+	time.Sleep(3 * time.Second)
 
 	c := exec.Command(args[0], args[1:]...)
 	c.Env = os.Environ()

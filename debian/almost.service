@@ -1,5 +1,5 @@
 [Unit]
-Description=Restore system immutability status according to the 'almoost' configuration
+Description=Restore system immutability status according to the 'almost' configuration
 
 Before=shutdown.target packagekit-offline-update.service
 
