@@ -105,31 +105,47 @@ func SetImmutableFlag(path string, verbose bool, state int, ifDiff bool) error {
 	files, _ := filepath.Glob(filepath.Join(path, "*"))
 
 	for _, file := range files {
-		fi, err := os.OpenFile(file, os.O_WRONLY, 0755)
+		fi, err := os.OpenFile(file, os.O_RDONLY, 0755)
+		useLegacy := false
 
 		if err != nil {
 			if verbose {
-				fmt.Printf("Error opening %s: %v, try opening as a directory", file, err)
+				fmt.Printf("Error opening %s: %v, try setting using the legacy chattr tool\n", file, err)
+				useLegacy = true
 			}
 
 			fi, err = os.Open(file)
 			if err != nil {
 				if verbose {
-					fmt.Printf("Skipping %s: %s", file, err.Error())
+					fmt.Printf("Skipping %s: %s\n", file, err.Error())
 					continue
 				}
 			}
 		}
 
 		if state == 0 {
-			err := SetAttr(fi, FS_IMMUTABLE_FL)
-			if err != nil && verbose {
-				fmt.Println("Error while removing immutable flag: ", err)
+			if useLegacy {
+				err := LegacySetAttr(file, "i")
+				if err != nil && verbose {
+					fmt.Printf("(legacy) Error setting immutable flag on %s: %s\n", file, err.Error())
+				}
+			} else {
+				err := SetAttr(fi, FS_IMMUTABLE_FL)
+				if err != nil && verbose {
+					fmt.Println("Error while removing immutable flag: ", err)
+				}
 			}
 		} else {
-			err := UnsetAttr(fi, FS_IMMUTABLE_FL)
-			if err != nil && verbose {
-				fmt.Println("Error while setting immutable flag: ", err)
+			if useLegacy {
+				err := LegacyUnsetAttr(file, "i")
+				if err != nil && verbose {
+					fmt.Printf("(legacy) Error removing immutable flag on %s: %s\n", file, err.Error())
+				}
+			} else {
+				err := UnsetAttr(fi, FS_IMMUTABLE_FL)
+				if err != nil && verbose {
+					fmt.Println("Error while setting immutable flag: ", err)
+				}
 			}
 		}
 	}

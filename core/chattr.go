@@ -7,6 +7,7 @@ package core
 
 import (
 	"os"
+	"os/exec"
 	"syscall"
 	"unsafe"
 )
@@ -130,4 +131,21 @@ func IsAttr(f *os.File, attr int32) (bool, error) {
 		return false, nil
 	}
 
+}
+
+/*
+Legacy functions using the chattr utility.
+*/
+func LegacySetAttr(path string, attr string) error {
+
+	cmd := exec.Command("chattr", "+"+attr, path)
+
+	return cmd.Run()
+}
+
+func LegacyUnsetAttr(path string, attr string) error {
+
+	cmd := exec.Command("chattr", "-"+attr, path)
+
+	return cmd.Run()
 }
