@@ -104,8 +104,11 @@ func OverlayRemove(path string, keep bool, verbose bool) error {
 
 	// then unmount the overlay
 	if err := unix.Unmount(path, 0); err != nil {
-		fmt.Println("Error unmounting overlay:", err)
-		return err
+		fmt.Println("The resource is busy, re-trying killing all processes using it..")
+		if err := unix.Unmount(path, unix.MNT_DETACH); err != nil {
+			fmt.Println("Error unmounting overlay:", err)
+			return err
+		}
 	}
 
 	// remove it from the internal database
