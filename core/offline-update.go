@@ -9,6 +9,8 @@ func OfflineUpdate() error {
 		return err
 	}
 
+	EnterRw(true)
+
 	// TODO: this should be done in a more elegant way, using a persistent
 	// overlay and fstab entries
 
@@ -23,6 +25,8 @@ func OfflineUpdate() error {
 	if err := OverlayRemove("/usr", true, true); err != nil {
 		return err
 	}
+
+	EnterRo(true)
 
 	return nil
 }
