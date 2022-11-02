@@ -36,10 +36,6 @@ func offlineUpdate(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if len(args) == 0 {
-		return fmt.Errorf("missing command")
-	}
-
 	err := core.OfflineUpdate()
 	if err != nil {
 		return err
