@@ -46,6 +46,7 @@ func main() {
 	rootCmd.AddCommand(cmd.NewOverlayCommand())
 	rootCmd.AddCommand(cmd.NewRunCommand())
 	rootCmd.AddCommand(cmd.NewShellCommand())
+	rootCmd.AddCommand(cmd.NewOfflineUpdateCommand())
 	rootCmd.SetHelpFunc(help)
 	rootCmd.Execute()
 }
