@@ -13,10 +13,6 @@ An on-demand immutability for VanillaOS.
 This program is meant to be used with [apx](https://github.com/vanilla-os/apx), 
 an apt replacement for VanillaOS.
 
-To use it with other distributions, be sure to re-pack it with the correct
-package manager set:
-- `"Almost::PkgManager::EntryPoint": "/usr/bin/apt"`
-
 ### Help
 ```
 Usage: 
