@@ -8,8 +8,7 @@ import (
 	"github.com/vanilla-os/almost/core"
 )
 
-func overlayUsage(*cobra.Command) error {
-	fmt.Print(`Description: 
+const USAGE_MSG=`Description: 
 Overlay a directory to make it mutable and being able to edit its contents without modifying the originals
 
 Usage:
@@ -20,16 +19,20 @@ Options:
 	--verbose/-v		enable verbose output
 	
 Commands:
-	new [directory]		overlay a directory
-	commit			commit the changes
-	discard			discard the changes
-	list			list the active overlays
+	new [directory]			Overlay a directory
+	commit [directory]		Commit the changes
+	discard [directory]		Discard the changes
+	list					List the active overlays
 
 Examples:
-	almost overlay new /etc/cute-path
-	almost overlay commit
-	almost overlay discard
-`)
+	# almost overlay new /etc/cute-path
+	# almost overlay commit /etc/cute-path
+	# almost overlay discard /etc/cute-path
+	# almost overlay list
+`
+
+func overlayUsage(*cobra.Command) error {
+	fmt.Print(USAGE_MSG)
 	return nil
 }
 
@@ -57,13 +60,13 @@ func overlay(cmd *cobra.Command, args []string) error {
 
 	switch args[0] {
 	case "new":
-		if len(args) != 2 {overlayUsage()}
+		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
 		return core.OverlayAdd(args[1], false, verbose)
 	case "commit":
-		if len(args) != 2 {overlayUsage()}
+		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
 		return core.OverlayRemove(args[1], true, verbose)
 	case "discard":
-		if len(args) != 2 {overlayUsage()}
+		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
 		return core.OverlayRemove(args[1], false, verbose)
 		
 	case "list":
