@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
 	"github.com/vanilla-os/almost/core"
 )
 
@@ -56,11 +57,15 @@ func overlay(cmd *cobra.Command, args []string) error {
 
 	switch args[0] {
 	case "new":
+		if len(args) != 2 {overlayUsage()}
 		return core.OverlayAdd(args[1], false, verbose)
 	case "commit":
+		if len(args) != 2 {overlayUsage()}
 		return core.OverlayRemove(args[1], true, verbose)
 	case "discard":
+		if len(args) != 2 {overlayUsage()}
 		return core.OverlayRemove(args[1], false, verbose)
+		
 	case "list":
 		return listOverlays()
 	default:
