@@ -60,13 +60,13 @@ func overlay(cmd *cobra.Command, args []string) error {
 
 	switch args[0] {
 	case "new":
-		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
+		if len(args) != 2 {return fmt.Errorf("missing command")}
 		return core.OverlayAdd(args[1], false, verbose)
 	case "commit":
-		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
+		if len(args) != 2 {return fmt.Errorf("missing command")}
 		return core.OverlayRemove(args[1], true, verbose)
 	case "discard":
-		if len(args) != 2 {fmt.Print(USAGE_MSG); return nil}
+		if len(args) != 2 {return fmt.Errorf("missing command")}
 		return core.OverlayRemove(args[1], false, verbose)
 		
 	case "list":
