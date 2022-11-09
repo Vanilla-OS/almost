@@ -26,10 +26,10 @@ func overlayUsage(*cobra.Command) error {
 			list					List the active overlays
 		
 		Examples:
-			# almost overlay new /etc/cute-path
-			# almost overlay commit /etc/cute-path
-			# almost overlay discard /etc/cute-path
-			# almost overlay list`)
+			almost overlay new /etc/cute-path
+			almost overlay commit /etc/cute-path
+			almost overlay discard /etc/cute-path
+			almost overlay list`)
 	return nil
 }
 
