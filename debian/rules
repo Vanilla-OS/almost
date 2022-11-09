@@ -5,6 +5,5 @@ export DH_GOPKG := github.com/vanilla-os/almost
 %:
 	dh $@ --buildsystem=golang --with=golang
 	
-override_dh_installinit:
-	dh_installinit --name=almost
-	dh_installinit --name=almost-update-mode
+override_dh_installsystemd:
+	dh_installsystemd --name=almost
