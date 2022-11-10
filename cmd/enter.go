@@ -29,7 +29,7 @@ Commands:
 Examples:
 	almost enter ro
 	almost enter rw
-`)	
+`)
 	return nil
 }
 
@@ -37,7 +37,7 @@ func NewEnterCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enter",
 		Short: "Enter sets the filesystem as read-only or read-write until reboot",
-		RunE: enter,
+		RunE:  enter,
 	}
 	cmd.SetUsageFunc(enterUsage)
 	cmd.Flags().BoolP("verbose", "v", false, "verbose output")
@@ -49,7 +49,7 @@ func enter(cmd *cobra.Command, args []string) error {
 	if !core.RootCheck(true) {
 		return nil
 	}
-	
+
 	if len(args) == 0 {
 		return fmt.Errorf("missing command")
 	}
@@ -61,6 +61,20 @@ func enter(cmd *cobra.Command, args []string) error {
 	case "ro":
 		return core.EnterRo(verbose)
 	case "rw":
+		if !core.AskConfirmation(`
+----------------------
+CONFIRMATION REQUIRED!
+----------------------
+Are you sure you want to set the filesystem as read-write?
+
+Making the filesystem read-write may consist of a security risk, third-party
+software may be able to modify the filesystem and cause data loss. Neither
+Vanilla OS nor the hardware manufacturer will be responsible for any data loss
+caused by doing this.
+
+This command is intended to be used only by advanced users.`) {
+			return nil
+		}
 		return core.EnterRw(verbose)
 	case "default":
 		return core.EnterDefault(verbose, on_persistent)
