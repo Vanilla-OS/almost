@@ -10,10 +10,10 @@ import (
 
 func shellUsage(*cobra.Command) error {
 	fmt.Print(`Description: 
-Runs a shell in read-write mode and returns to read-only mode after the shell exits.
+	Runs a shell in read-write mode and returns to read-only mode after the shell exits.
 
 Usage:
-shell [command]
+	shell [command]
 
 Options:
 	--help/-h		show this message

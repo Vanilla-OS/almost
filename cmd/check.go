@@ -9,17 +9,17 @@ import (
 
 func checkUsage(*cobra.Command) error {
 	fmt.Print(`Description: 
-Check whether the filesystem is read-only or read-write.
+	Check whether the filesystem is read-only or read-write.
 
 Usage:
-check [options] [command]
+	check [options] [command]
 
 Options:
 	--help/-h		show this message
 
 Examples:
 	almost check
-`)	
+`)
 	return nil
 }
 
@@ -27,7 +27,7 @@ func NewCheckCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "check",
 		Short: "Check whether the filesystem is read-only or read-write",
-		RunE: check,
+		RunE:  check,
 	}
 	cmd.SetUsageFunc(checkUsage)
 	return cmd

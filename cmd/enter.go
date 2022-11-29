@@ -9,13 +9,13 @@ import (
 
 func enterUsage(*cobra.Command) error {
 	fmt.Print(`Description: 
-Set the filesystem as read-only or read-write until reboot.
+	Set the filesystem as read-only or read-write until reboot.
 
-Setting the filesystem as read-write mode may consist of a security risk, be
-careful when using this command.
+	Setting the filesystem as read-write mode may consist of a security risk, be
+	careful when using this command.
 
 Usage:
-enter [options] [command]
+	enter [options] [command]
 
 Options:
 	--help/-h		show this message

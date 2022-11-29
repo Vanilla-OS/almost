@@ -9,11 +9,11 @@ import (
 
 func offlineUpdateUsage(*cobra.Command) error {
 	fmt.Print(`Description: 
-Performs an offline update of the system. This command is intended to be run
-from the package-offline-update service, and should not be run manually.
+	Performs an offline update of the system. This command is intended to be run
+	from the package-offline-update service, and should not be run manually.
 
 Usage:
-offline-update [command]
+	offline-update [command]
 
 Options:
 	--help/-h		show this message

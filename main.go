@@ -27,6 +27,8 @@ Commands:
 	run			runs a command in read-write mode and returns to read-only mode after the command exits
 	shell			runs a shell in read-write mode and returns to read-only mode after the shell exits
 	overlay			overlay a directory
+	status			show information about the current state
+	state			manage persistent overlays
 `)
 }
 
@@ -46,6 +48,8 @@ func main() {
 	rootCmd.AddCommand(cmd.NewOverlayCommand())
 	rootCmd.AddCommand(cmd.NewRunCommand())
 	rootCmd.AddCommand(cmd.NewShellCommand())
+	rootCmd.AddCommand(cmd.NewStatusCommand())
+	rootCmd.AddCommand(cmd.NewStateCommand())
 	rootCmd.AddCommand(cmd.NewOfflineUpdateCommand())
 	rootCmd.SetHelpFunc(help)
 	rootCmd.Execute()

@@ -12,10 +12,10 @@ import (
 
 func runUsage(*cobra.Command) error {
 	fmt.Print(`Description: 
-Runs a command in read-write mode and returns to read-only mode after the command exits.
+	Runs a command in read-write mode and returns to read-only mode after the command exits.
 
 Usage:
-run [command]
+	run [command]
 
 Options:
 	--help/-h		show this message
